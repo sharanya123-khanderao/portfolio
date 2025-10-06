@@ -1,5 +1,4 @@
 import { useState } from "react";
-import emailjs from "@emailjs/browser";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -22,26 +21,30 @@ const Contact = () => {
     setIsSending(true);
 
     try {
-      await emailjs.send(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID,
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-        formData,
-        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-      );
-
-      toast({
-        title: "Message sent successfully!",
-        description: "Thanks for reaching out. I’ll reply soon!",
-        duration: 3000,
+      const response = await fetch("https://formspree.io/f/mrbylyje", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
       });
 
-      setFormData({ name: "", email: "", message: "" });
+      if (response.ok) {
+        toast({
+          title: "Message sent successfully!",
+          description: "Thanks for reaching out. I’ll reply soon!",
+          duration: 3000
+        });
+        setFormData({ name: "", email: "", message: "" });
+      } else {
+        throw new Error("Failed to send");
+      }
     } catch (error) {
-      console.error("EmailJS Error:", error);
+      console.error("Formspree Error:", error);
       toast({
         title: "Failed to send message",
         description: "Please try again later or contact me via LinkedIn/email.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setIsSending(false);
@@ -71,31 +74,23 @@ const Contact = () => {
 
         {/* Main grid */}
         <div className="max-w-6xl mx-auto grid lg:grid-cols-5 gap-8">
-
+          
           {/* Contact details */}
           <div className="lg:col-span-2 space-y-4">
             <h3 className="text-2xl font-bold mb-6">Get in Touch</h3>
             
-            <a 
-              href="mailto:sharanyakvn@gmail.com"
-              className="group flex items-start gap-4 p-6 rounded-2xl glass-card"
-            >
+            <a href="mailto:sharanyakvn@gmail.com" className="group flex items-start gap-4 p-6 rounded-2xl glass-card">
               <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
                 <Mail className="w-6 h-6 text-primary" />
               </div>
               <div className="flex-1">
                 <p className="font-semibold mb-1">Email</p>
-                <p className="text-sm text-muted-foreground break-all">
-                  sharanyakvn@gmail.com
-                </p>
+                <p className="text-sm text-muted-foreground break-all">sharanyakvn@gmail.com</p>
               </div>
               <ArrowRight className="w-5 h-5 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
             </a>
 
-            <a 
-              href="tel:+16674330652"
-              className="group flex items-start gap-4 p-6 rounded-2xl glass-card"
-            >
+            <a href="tel:+16674330652" className="group flex items-start gap-4 p-6 rounded-2xl glass-card">
               <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
                 <Phone className="w-6 h-6 text-primary" />
               </div>
@@ -106,7 +101,7 @@ const Contact = () => {
               <ArrowRight className="w-5 h-5 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
             </a>
 
-            <a 
+            <a
               href="https://www.linkedin.com/in/sharanya-khanderao-189205193/"
               target="_blank"
               rel="noopener noreferrer"
@@ -176,7 +171,7 @@ const Contact = () => {
                   />
                 </div>
 
-                <Button 
+                <Button
                   type="submit"
                   disabled={isSending}
                   className="group w-full h-12 gap-2 rounded-xl shadow-lg hover:shadow-xl hover:shadow-primary/20 transition-all hover:scale-105"
